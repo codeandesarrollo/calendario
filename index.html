@@ -19,6 +19,9 @@
     --shadow:0 18px 45px rgba(0,0,0,.45); --radius:22px;
     --u-high:#ff6161; --u-med:#ffd157; --u-low:#63f3a7; --u-past:#93a0b5;
     --touch:48px;
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --focus-glow: 0 0 0 3px rgba(123, 123, 255, 0.4);
+    --card-padding: 16px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -45,215 +48,225 @@
   @keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,40px)}}
 
   .app{min-height:100dvh; padding-bottom:calc(env(safe-area-inset-bottom) + 84px); max-width:520px; margin:0 auto; display:flex; flex-direction:column;}
-  /* topbar */
-  .topbar{position:sticky; top:0; z-index:10; background:linear-gradient(180deg, rgba(7,9,14,.9), rgba(7,9,14,.55)); backdrop-filter: blur(14px); border-bottom:1px solid var(--border)}
-  .topbar-inner{display:flex; align-items:center; gap:10px; padding: calc(env(safe-area-inset-top) + 16px) 16px 12px;}
-  .round{width:var(--touch); height:var(--touch); display:grid; place-items:center; border-radius:14px; border:1px solid var(--border); background:#0b0f18; color:var(--text); cursor:pointer; transition:.08s transform}
-  .round:active{ transform:scale(.98) }
-  .title{flex:1; text-align:center; display:flex; align-items:center; justify-content:center; gap:10px; font-weight:700; letter-spacing:.3px;}
-  .title .month-year{ font-size:1.2rem; background: linear-gradient(90deg,var(--accent-a),var(--accent-b),var(--accent-c)); -webkit-background-clip:text; background-clip:text; color:transparent; }
-  .chip{border:1px solid var(--border); color:var(--muted); padding:6px 10px; border-radius:999px; font-size:.82rem; background:#0b0f18; cursor:pointer}
-  .streak{font-size:.78rem; color:var(--muted)}
 
-  /* ===== CALENDARIO MEJORADO ===== */
+  /* topbar */
+  .topbar{
+    position:sticky; top:0; z-index:10;
+    background:linear-gradient(180deg, rgba(7,9,14,.95) 0%, rgba(7,9,14,.7) 100%);
+    backdrop-filter: blur(14px);
+    border-bottom:1px solid var(--border);
+    transition: var(--transition);
+  }
+  .topbar.scrolled { background: rgba(7,9,14,0.98); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+  .topbar-inner{ display:flex; align-items:center; gap:10px; padding: calc(env(safe-area-inset-top) + 12px) 16px 10px; }
+  .round{
+    width:var(--touch); height:var(--touch);
+    display:grid; place-items:center; border-radius:14px;
+    border:1px solid var(--border); background:#0b0f18;
+    color:var(--text); cursor:pointer; transition: var(--transition); font-weight: 600;
+  }
+  .round:hover, .round:focus { transform: translateY(-2px); border-color: rgba(123, 123, 255, 0.4); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+  .round:active{ transform:scale(.95) }
+  .title{ flex:1; text-align:center; display:flex; align-items:center; justify-content:center; gap:10px; font-weight:700; letter-spacing:.3px; }
+  .title .month-year{
+    font-size:1.2rem;
+    background: linear-gradient(90deg,var(--accent-a),var(--accent-b),var(--accent-c));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .chip{
+    border:1px solid var(--border); color:var(--muted);
+    padding:6px 12px; border-radius:999px; font-size:.82rem;
+    background:#0b0f18; cursor:pointer; transition: var(--transition);
+  }
+  .chip:hover, .chip:focus { background: rgba(123, 123, 255, 0.1); border-color: rgba(123, 123, 255, 0.4); color: #dbe4ff; }
+  .streak{
+    font-size:.78rem; background: linear-gradient(135deg, #ff9a3d, #ff6b6b);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    font-weight: 600; padding: 4px 8px; border-radius: 12px; background-color: rgba(255, 107, 107, 0.1);
+  }
+
+  /* calendario */
   .card{
-    margin:16px; padding:12px; border-radius:26px;
+    margin:16px; padding:var(--card-padding); border-radius:26px;
     background: linear-gradient(var(--card), var(--card)) padding-box,
                linear-gradient(135deg, rgba(48,224,161,.35), rgba(123,123,255,.28), rgba(255,119,225,.28)) border-box;
     border:1px solid transparent; box-shadow: var(--shadow);
+    transition: var(--transition);
   }
-  .weekdays{display:grid; grid-template-columns:repeat(7,1fr); padding:6px 10px 8px; gap:6px; font-size:.82rem; color:#c6ceea; text-align:center; letter-spacing:.3px}
+  .weekdays{
+    display:grid; grid-template-columns:repeat(7,1fr);
+    padding:10px 10px 12px; gap:6px;
+    font-size:.82rem; color:#c6ceea; text-align:center; letter-spacing:.3px; font-weight: 600;
+  }
   .weekdays div:nth-child(6), .weekdays div:nth-child(7){ color:#9fbaff }
 
-  .grid{display:grid; grid-template-columns:repeat(7,1fr); gap:10px; padding:8px 10px 12px;}
+  .grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:8px; padding:8px 10px 16px; }
   .day{
     position:relative; aspect-ratio:1/1; border-radius:18px;
     display:flex; align-items:center; justify-content:center;
-    font-weight:700; font-size:1.02rem; letter-spacing:.2px;
-    color:#e7ecff;
+    font-weight:700; font-size:1.02rem; letter-spacing:.2px; color:#e7ecff;
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-    border:1px solid var(--border); cursor:pointer; touch-action:manipulation;
-    transition: transform .08s ease, box-shadow .20s ease, border-color .2s ease, background .2s ease, color .2s ease;
+    border:1px solid var(--border); cursor:pointer; touch-action:manipulation; transition: var(--transition);
   }
-  .day:hover{ transform: translateY(-1px); }
-  .day.out{ color:#8c94a7; opacity:.9; }
-  .day.weekend{ color:#dfe6ff; background:linear-gradient(180deg, rgba(124,140,255,.06), rgba(255,255,255,.02)); }
-  .ring-today{position:absolute; inset:6px; border-radius:14px; border:2px solid var(--ring); pointer-events:none; box-shadow: 0 0 0 6px rgba(123,123,255,.10);}
-  .day.selected{ color:#10131b; background: radial-gradient(240px 160px at 50% -30%, rgba(48,224,161,.38), transparent 60%), radial-gradient(220px 140px at 20% 120%, rgba(123,123,255,.38), transparent 55%), #e9f0ff; border-color: rgba(123,123,255,.45); box-shadow: 0 8px 28px rgba(0,0,0,.30), inset 0 0 0 2px rgba(123,123,255,.20); }
-  /* halo por urgencia del día */
-  .day[data-maxurg="high"]{ box-shadow: inset 0 0 0 2px rgba(255,97,97,.35), 0 10px 26px rgba(255,97,97,.12); }
+  .day:hover{ transform: translateY(-2px) scale(1.05); border-color: rgba(123, 123, 255, 0.3); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+  .day:focus { outline: none; box-shadow: var(--focus-glow); }
+  .day.out{ color:#6b728c; opacity:.8; }
+  .day.weekend{ color:#dfe6ff; background:linear-gradient(180deg, rgba(124,140,255,.08), rgba(255,255,255,.03)); }
+  .ring-today{
+    position:absolute; inset:6px; border-radius:14px;
+    border:2px solid var(--ring); pointer-events:none; box-shadow: 0 0 0 6px rgba(123,123,255,.10);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(123, 123, 255, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(123, 123, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(123, 123, 255, 0); } }
+  .day.selected{
+    color:#10131b;
+    background: radial-gradient(240px 160px at 50% -30%, rgba(48,224,161,.38), transparent 60%),
+                radial-gradient(220px 140px at 20% 120%, rgba(123,123,255,.38), transparent 55%),
+                #e9f0ff;
+    border-color: rgba(123,123,255,.45);
+    box-shadow: 0 8px 28px rgba(0,0,0,.30), inset 0 0 0 2px rgba(123,123,255,.20);
+    transform: scale(1.05);
+  }
+  .day[data-maxurg="high"]{ box-shadow: inset 0 0 0 2px rgba(255,97,97,.35), 0 10px 26px rgba(255,97,97,.12); animation: alert-pulse 2s infinite; }
+  @keyframes alert-pulse { 0%{box-shadow: inset 0 0 0 2px rgba(255,97,97,.35), 0 10px 26px rgba(255,97,97,.12)} 50%{box-shadow: inset 0 0 0 2px rgba(255,97,97,.5), 0 10px 26px rgba(255,97,97,.2)} 100%{box-shadow: inset 0 0 0 2px rgba(255,97,97,.35), 0 10px 26px rgba(255,97,97,.12)} }
   .day[data-maxurg="med"] { box-shadow: inset 0 0 0 2px rgba(255,209,87,.30), 0 10px 26px rgba(255,209,87,.10); }
   .day[data-maxurg="low"] { box-shadow: inset 0 0 0 2px rgba(99,243,167,.28), 0 10px 26px rgba(99,243,167,.08); }
   .day[data-maxurg="past"]{ box-shadow: inset 0 0 0 2px rgba(147,160,181,.26); }
-  .badges{ position:absolute; left:8px; bottom:8px; display:flex; gap:5px }
-  .dot{ width:7px; height:7px; border-radius:999px; }
+  .badges{ position:absolute; left:6px; bottom:6px; display:flex; gap:4px; }
+  .dot{ width:7px; height:7px; border-radius:999px; transition: var(--transition); }
   .dot.high{ background:var(--u-high); box-shadow:0 0 0 3px rgba(255,101,101,.16); }
   .dot.med { background:var(--u-med);  box-shadow:0 0 0 3px rgba(255,211,100,.16); }
   .dot.low { background:var(--u-low);  box-shadow:0 0 0 3px rgba(102,245,160,.16); }
   .dot.past{ background:var(--u-past); box-shadow:0 0 0 3px rgba(147,160,181,.16); }
 
-  /* ===== SHEET SIMPLE PARA AGREGAR ===== */
-  .sheet{ position:fixed; left:0; right:0; bottom:0; transform:translateY(100%); transition:transform .28s ease; z-index:50; padding-bottom: env(safe-area-inset-bottom); }
+  /* sheet */
+  .sheet{ position:fixed; left:0; right:0; bottom:0; transform:translateY(100%); transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); z-index:50; padding-bottom: env(safe-area-inset-bottom); }
   .sheet.open{ transform:translateY(0) }
   .panel{
-    background: linear-gradient(180deg, rgba(18,22,33,.92), rgba(10,12,18,.96));
-    backdrop-filter: blur(12px);
+    background: linear-gradient(180deg, rgba(18,22,33,.98), rgba(10,12,18,.98));
+    backdrop-filter: blur(20px);
     border-top-left-radius: 26px; border-top-right-radius: 26px;
     border:1px solid var(--border); box-shadow: var(--shadow);
-    padding:12px 12px 18px; max-width:520px; margin:0 auto;
+    padding:16px 16px 24px; max-width:520px; margin:0 auto;
   }
-  .dragbar{ width:52px; height:6px; background:#2e3342; border-radius:999px; margin:6px auto 12px; }
-  .panel h3{ margin:6px 0 0; font-size:1.02rem; }
-  .subtitle{ color:var(--muted); font-size:.86rem; }
+  .dragbar{ width:52px; height:6px; background:#2e3342; border-radius:999px; margin:6px auto 16px; cursor: grab; transition: var(--transition); }
+  .dragbar:active { cursor: grabbing; background: #3e4352; }
+  .panel h3{ margin:6px 0 4px; font-size:1.1rem; font-weight: 700; }
+  .subtitle{ color:var(--muted); font-size:.86rem; margin-bottom: 16px; }
 
   /* barra rápida */
-  .quick{
-    display:grid; grid-template-columns:1fr auto auto; gap:8px; margin:12px 0 6px;
-    align-items:center;
-  }
+  .quick{ display:grid; grid-template-columns:1fr auto auto; gap:10px; margin:16px 0 10px; align-items:center; }
   .input{
-    height:46px; background:#0e1118; border:1px solid var(--border); color:var(--text);
-    border-radius:14px; padding:10px 12px; font:inherit; outline:none; width:100%;
-    transition: border-color .2s ease, box-shadow .2s ease;
+    height:48px; background:#0e1118; border:1px solid var(--border); color:var(--text);
+    border-radius:14px; padding:12px 16px; font:inherit; outline:none; width:100%; transition: var(--transition); font-size: 0.95rem;
   }
-  .input:focus{ border-color: rgba(124,140,255,.45); box-shadow: 0 0 0 4px rgba(124,140,255,.12); }
-  .control{ display:flex; align-items:center; gap:8px; height:46px; padding:0 10px; border-radius:14px; border:1px solid var(--border); background:#0f1118; color:#dbe4ff; }
-  .control select, .control input[type="time"]{ background:none; border:0; color:inherit; font:inherit; outline:none; }
+  .input:focus{ border-color: rgba(124,140,255,.65); box-shadow: 0 0 0 4px rgba(124,140,255,.15); background: #0d1017; }
+  .control{ display:flex; align-items:center; gap:8px; height:48px; padding:0 12px; border-radius:14px; border:1px solid var(--border); background:#0f1118; color:#dbe4ff; transition: var(--transition); }
+  .control:focus-within { border-color: rgba(124,140,255,.45); box-shadow: 0 0 0 3px rgba(124,140,255,.12); }
+  .control select, .control input[type="time"]{ background:none; border:0; color:inherit; font:inherit; outline:none; font-size: 0.9rem; cursor: pointer; }
   .control small{ color:var(--muted) }
 
-  .chips{ display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 8px}
-  .chip-btn{ background:#0f1118; border:1px solid var(--border); color:#bcd0ff; border-radius:999px; padding:8px 10px; font-size:.78rem; cursor:pointer; }
-  .chip-btn:hover{ color:#fff }
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 14px; }
+  .chip-btn{
+    background:#0f1118; border:1px solid var(--border); color:#bcd0ff; border-radius:999px;
+    padding:8px 14px; font-size:.82rem; cursor:pointer; transition: var(--transition);
+  }
+  .chip-btn:hover, .chip-btn:focus{ color:#fff; background: rgba(123, 123, 255, 0.15); border-color: rgba(123, 123, 255, 0.4); transform: translateY(-2px); }
 
-  .preview{ font-size:.86rem; color:#c9d7ff; background:#0f131d; border:1px solid var(--border); border-radius:12px; padding:8px 10px; }
+  .preview{
+    font-size:.86rem; color:#c9d7ff; background:#0f131d; border:1px solid var(--border);
+    border-radius:12px; padding:12px 14px; margin: 10px 0 16px; transition: var(--transition);
+  }
+  .preview:empty { display: none; }
 
   .btn{
-    height:48px; padding:0 16px; border-radius:14px; font-weight:800; cursor:pointer; border:0;
+    height:50px; padding:0 20px; border-radius:14px; font-weight:800; cursor:pointer; border:0;
     background: linear-gradient(90deg, #27d8b7, #8ea0ff); color:#031a15; box-shadow: 0 14px 28px rgba(19,190,160,.30);
+    transition: var(--transition); font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px;
   }
-  .btn.secondary{ background:#161a24; color:var(--muted); border:1px solid var(--border); box-shadow:none }
+  .btn:hover, .btn:focus { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(19,190,160,.4); }
+  .btn:active { transform: translateY(0); }
+  .btn.secondary{ background:#161a24; color:var(--muted); border:1px solid var(--border); box-shadow:none; }
+  .btn.secondary:hover, .btn.secondary:focus { background: #1a1e2a; color: #e2e9ff; border-color: rgba(123, 123, 255, 0.4); }
 
   /* lista de eventos */
-  .ev-list{ display:flex; flex-direction:column; gap:10px; margin-top:10px; }
-  .ev{
-    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
-    border:1px solid var(--border); border-radius:16px; padding:12px;
-    display:flex; gap:10px; align-items:center;
-  }
-  .ev .time{ font-weight:700; font-size:.92rem; color:#cdd6ff; min-width:62px }
-  .ev .title{ font-size:.98rem }
-  .ev .meta{ margin-left:auto; font-size:.78rem; color:#muted; }
-  .ev.done .title{ text-decoration: line-through; opacity:.7; }
-  .ev[data-urg="high"]{ border-left:5px solid var(--u-high); background:linear-gradient(180deg, rgba(255,101,101,.08), transparent); }
-  .ev[data-urg="med"] { border-left:5px solid var(--u-med);  background:linear-gradient(180deg, rgba(255,211,100,.08), transparent); }
-  .ev[data-urg="low"] { border-left:5px solid var(--u-low);  background:linear-gradient(180deg, rgba(102,245,160,.08), transparent); }
-  .ev[data-urg="past"]{ border-left:5px solid var(--u-past); background:linear-gradient(180deg, rgba(147,160,181,.08), transparent); }
+  .ev-list{ display:flex; flex-direction:column; gap:12px; margin-top:16px; max-height: 40vh; overflow-y: auto; padding-right: 4px; }
+  .ev-list::-webkit-scrollbar { width: 6px; }
+  .ev-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+  .ev-list::-webkit-scrollbar-thumb { background: rgba(123,123,255,0.3); border-radius: 10px; }
+  .ev-list::-webkit-scrollbar-thumb:hover { background: rgba(123,123,255,0.5); }
 
-  .mini{ height:36px; padding:0 10px; border-radius:10px; border:1px solid var(--border); background:#10131b; color:#fff; cursor:pointer; }
-  .mini.danger{ border-color: rgba(255,101,101,.4); }
-  .mini.good{ border-color: rgba(102,245,160,.4); color:#66f5a0; }
-  .mini.tg{ border-color: rgba(126,206,255,.45); color:#8ecbff; }
+  .ev{
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+    border:1px solid var(--border); border-radius:16px; padding:14px;
+    display:flex; gap:12px; align-items:center; transition: var(--transition);
+  }
+  .ev:hover { transform: translateY(-2px); border-color: rgba(123, 123, 255, 0.3); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+  .ev .time{ font-weight:700; font-size:.92rem; color:#cdd6ff; min-width:62px; font-feature-settings: "tnum"; }
+  .ev .title{ font-size:.98rem; line-height: 1.4; }
+  .ev .meta{ margin-left:auto; font-size:.78rem; color: var(--muted); text-align: right; min-width: 70px; }
+  .ev.done .title{ text-decoration: line-through; opacity:.7; }
+  .ev[data-urg="high"]{ border-left:5px solid var(--u-high); background:linear-gradient(180deg, rgba(255,101,101,.10), transparent); }
+  .ev[data-urg="med"] { border-left:5px solid var(--u-med);  background:linear-gradient(180deg, rgba(255,211,100,.10), transparent); }
+  .ev[data-urg="low"] { border-left:5px solid var(--u-low);  background:linear-gradient(180deg, rgba(102,245,160,.10), transparent); }
+  .ev[data-urg="past"]{ border-left:5px solid var(--u-past); background:linear-gradient(180deg, rgba(147,160,181,.10), transparent); }
+
+  .mini{ height:36px; width:36px; padding:0; border-radius:10px; border:1px solid var(--border); background:#10131b; color:#fff; cursor:pointer; display: grid; place-items: center; transition: var(--transition); }
+  .mini:hover, .mini:focus { transform: scale(1.1); border-color: rgba(123, 123, 255, 0.4); }
+  .mini.danger{ border-color: rgba(255,101,101,.4); background: rgba(255,101,101,0.1); }
+  .mini.danger:hover, .mini.danger:focus { background: rgba(255,101,101,0.2); }
+  .mini.good{ border-color: rgba(102,245,160,.4); color:#66f5a0; background: rgba(102,245,160,0.1); }
+  .mini.good:hover, .mini.good:focus { background: rgba(102,245,160,0.2); }
 
   .fab{
     position:fixed; right:16px; bottom: calc(env(safe-area-inset-bottom) + 16px);
     display:flex; align-items:center; gap:10px;
-    height:56px; padding:0 16px 0 14px; border-radius:18px;
-    background:linear-gradient(90deg, #2be7c2, #8ea0ff);
-    color:#041a16; font-weight:800; letter-spacing:.2px;
-    box-shadow: 0 16px 36px rgba(46, 214, 186, .35);
-    cursor:pointer; z-index:40;
+    height:56px; padding:0 20px 0 16px; border-radius:18px;
+    background:linear-gradient(90deg, #2be7c2, #8ea0ff); color:#041a16; font-weight:800; letter-spacing:.2px;
+    box-shadow: 0 16px 36px rgba(46, 214, 186, .35); cursor:pointer; z-index:40; transition: var(--transition);
   }
+  .fab:hover, .fab:focus { transform: translateY(-4px) scale(1.05); box-shadow: 0 20px 40px rgba(46, 214, 186, .5); }
+  .fab:active { transform: translateY(0) scale(1); }
 
-  .toast{ position:fixed; left:50%; bottom: calc(env(safe-area-inset-bottom) + 84px); transform: translateX(-50%) translateY(20px); background: #10141d; color:#d8e0ff; border:1px solid var(--border); padding:10px 14px; border-radius:12px; box-shadow: var(--shadow); opacity:0; transition: .25s ease; z-index:60; }
+  .toast{
+    position:fixed; left:50%; bottom: calc(env(safe-area-inset-bottom) + 84px);
+    transform: translateX(-50%) translateY(20px);
+    background: #10141d; color:#d8e0ff;
+    border:1px solid var(--border); padding:12px 18px;
+    border-radius:12px; box-shadow: var(--shadow);
+    opacity:0; transition: .3s ease; z-index:60;
+    display: flex; align-items: center; gap: 10px;
+  }
   .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
-  .errorbar{ position:fixed; left:16px; right:16px; top:16px; z-index:100; background:#3a1010; border:1px solid #ff6b6b; color:#ffdcdc; padding:10px 12px; border-radius:12px; }
-
-  /* ========== MASCOTA (mismo módulo con drag + poses) ========== */
-  .pet{position:fixed; left:16px; bottom:16px; display:flex; align-items:flex-end; gap:10px; z-index:60; user-select:none; cursor:grab;}
-  .pet.dragging{cursor:grabbing}
-  .pet.idle .pet-svg{ animation:petFloat 6s ease-in-out infinite; }
-  @keyframes petFloat{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-  .pet-svg{ width:120px; height:120px; filter:drop-shadow(0 16px 30px rgba(0,0,0,.35)); transition:transform .15s ease; }
-  .eye{ transform-origin:center; animation:blink 4.5s infinite; }
-  @keyframes blink{ 0%,2%,60%,62%,100%{transform:scaleY(1)} 1%,61%{transform:scaleY(.1)} }
-  .arm-right{ transform-origin:88px 66px; }
-  .tail{ transform-origin:102px 84px; }
-  .pet.wave .arm-right{ animation:waveArm 1.2s ease }
-  @keyframes waveArm{ 0%{transform:rotate(0)} 30%{transform:rotate(-22deg)} 60%{transform:rotate(14deg)} 100%{transform:rotate(0)} }
-  .pet.wag  .tail{ animation:wagTail 1.2s ease }
-  @keyframes wagTail{ 0%{transform:rotate(0)} 30%{transform:rotate(18deg)} 60%{transform:rotate(-12deg)} 100%{transform:rotate(0)} }
-  .pose-alert .pet-svg{ animation:alertShake .6s ease-in-out infinite !important; }
-  @keyframes alertShake{ 0%{transform:translate(0) rotate(0)} 25%{transform:translate(1px,-1px) rotate(-2deg)} 50%{transform:translate(-1px,1px) rotate(2deg)} 75%{transform:translate(1px,0) rotate(-1.5deg)} 100%{transform:translate(0) rotate(0)} }
-  .pose-focus .pet-svg{ animation:focusBreath 2s ease-in-out infinite !important; }
-  @keyframes focusBreath{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
-  .pose-happy .pet-svg{ animation:happyHop 1.2s ease-in-out infinite !important; }
-  @keyframes happyHop{ 0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)} }
-
-  /* Globo del mensaje */
-  .pet-bubble{
-    max-width:70vw; background:rgba(16,20,29,.9);
-    border:1px solid rgba(255,255,255,.08); padding:10px 12px; padding-right:46px;
-    border-radius:12px; box-shadow:0 14px 30px rgba(0,0,0,.35);
-    transform:translateY(8px); opacity:0; transition:.25s ease; position:relative;
+  .errorbar{
+    position:fixed; left:16px; right:16px; top:16px;
+    z-index:100; background:#3a1010; border:1px solid #ff6b6b; color:#ffdcdc;
+    padding:12px 16px; border-radius:12px; display: flex; align-items: center; gap: 10px;
   }
-  .pet-bubble::after{content:""; position:absolute; left:14px; bottom:-7px; width:12px; height:12px; background:rgba(16,20,29,.9); border-left:1px solid rgba(255,255,255,.08); border-bottom:1px solid rgba(255,255,255,.08); transform:rotate(45deg);}
-  .pet-bubble.show{opacity:1; transform:translateY(0);}
-  .pet-bubble .txt{font-size:.9rem; color:#dbe3ff}
-  .pet-bubble .x{position:absolute; top:4px; right:6px; width:22px; height:22px; border-radius:6px; background:#131722; color:#9aa3b2; border:1px solid rgba(255,255,255,.08); cursor:pointer}
 
-  /* Engranaje fuera del globo */
-  .pet-gear{
-    position:absolute;
-    left:88px;
-    bottom:112px;
-    width:34px; height:34px;
-    border-radius:10px;
-    background:#10141d;
-    color:#cfd6ff;
-    border:1px solid rgba(255,255,255,.10);
-    display:grid; place-items:center;
-    box-shadow:0 12px 24px rgba(0,0,0,.35);
-    cursor:pointer;
-    z-index:61;
+  /* responsivo */
+  @media (max-width: 380px) {
+    .quick { grid-template-columns: 1fr; gap: 12px; }
+    .title { flex-direction: column; gap: 6px; }
+    .weekdays { font-size: 0.75rem; }
+    .day { font-size: 0.9rem; border-radius: 14px; }
   }
-  .pet-gear:active{ transform:scale(.96); }
-
-  .pet-show{position:fixed; left:16px; bottom:16px; background:#10141d; color:#dbe3ff; border:1px solid rgba(255,255,255,.08); height:38px; padding:0 12px; border-radius:999px; display:none; align-items:center; gap:6px; z-index:60}
-  .pet-show::before{content:"Mascota"; font-size:.82rem; color:#9aa3b2}
-  .fx{position:absolute; inset:0; overflow:visible; pointer-events:none;}
-  .confetti{position:absolute; bottom:14px; font-size:16px; animation:confettiUp 1.6s ease forwards; opacity:.95}
-  @keyframes confettiUp{ 0%{transform:translateY(0) scale(.9);opacity:.95} 70%{transform:translateY(-40px) scale(1);opacity:1} 100%{transform:translateY(-60px) scale(.95);opacity:0} }
-  /* paletas por especie */
-  .pet{ --p-body:#8ea0ff; --p-belly:#b9c3ff; --p-cheek:#ffbfd1; --p-eye:#0e1118; --p-nose:#20242e; --p-beak:#f6a53e; }
-  .pet[data-species="cat"]{ --p-body:#8ea0ff; --p-belly:#b9c3ff; --p-nose:#1e2430; }
-  .pet[data-species="dog"]{ --p-body:#d28a4a; --p-belly:#f2b572; --p-nose:#1a1a1a; }
-  .pet[data-species="chick"]{ --p-body:#ffe56d; --p-belly:#fff49d; --p-eye:#272727; --p-beak:#f6a53e; }
-  .pet[data-species="koala"]{ --p-body:#aeb9c8; --p-belly:#cfd6df; --p-nose:#2f2f3a; }
-  .pet[data-species="chick"] .ears{display:none} .pet[data-species="chick"] .tail{display:none} .pet[data-species="chick"] .nose{display:none} .pet[data-species="chick"] .beak{display:block}
-  .pet[data-species="cat"] .beak, .pet[data-species="dog"] .beak, .pet[data-species="koala"] .beak{display:none}
-  .pet-picker{position:fixed; inset:0; display:none; place-items:end center; z-index:70; background:rgba(0,0,0,.25); backdrop-filter: blur(2px);}
-  .pet-picker.open{display:grid}
-  .pet-panel{width:100%; max-width:520px; background:linear-gradient(180deg, rgba(20,23,35,.95), rgba(12,14,20,.95)); border-top-left-radius:24px; border-top-right-radius:24px; border:1px solid rgba(255,255,255,.08); padding:14px 16px 18px;}
-  .pet-panel h4{margin:6px 0 10px; font-size:1rem}
-  .pet-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
-  .pet-opt{border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:10px; background:#0f1118; text-align:center; cursor:pointer}
-  .pet-opt .avatar{width:54px; height:54px; border-radius:12px; display:grid; place-items:center; margin:0 auto 6px; font-size:28px}
-  .pet-opt small{color:#9aa3b2; font-size:.76rem}
-  .pet-opt.active{outline:2px solid #7c8cff}
-
-  @media (min-width:521px){ body{ display:grid; place-items:center; } }
+  @media (min-width:521px){
+    body{ display:grid; place-items:center;
+      background: radial-gradient(1200px 700px at 50% -260px, #151827 20%, var(--bg) 60%);
+    }
+  }
 </style>
 </head>
 <body class="bg-blobs">
   <div class="app">
-    <div class="topbar">
+    <div class="topbar" id="topbar">
       <div class="topbar-inner">
         <button class="round" id="prevBtn" aria-label="Mes anterior">‹</button>
         <div class="title">
           <span class="month-year" id="monthLabel">—</span>
           <button class="chip" id="todayBtn" aria-label="Ir a hoy">Hoy</button>
           <button class="chip" id="installBtn" style="display:none">Instalar</button>
-
           <span class="streak" id="streakLabel">🔥 0</span>
         </div>
         <button class="round" id="nextBtn" aria-label="Mes siguiente">›</button>
@@ -268,7 +281,7 @@
 
   <button class="fab" id="fab" title="Nuevo recordatorio"><span class="plus">＋</span> Nuevo</button>
 
-  <!-- Sheet simplificado -->
+  <!-- Sheet -->
   <div class="sheet" id="sheet">
     <div class="panel">
       <div class="dragbar" id="dragbar"></div>
@@ -293,61 +306,9 @@
 
       <div class="ev-list" id="evList"></div>
 
-      <div style="display:flex; gap:10px; margin-top:12px">
-        <button class="btn" id="saveBtn" style="flex:1">Guardar</button>
-        <!-- NUEVO: Guardar + Telegram -->
-        <button class="btn" id="saveTgBtn" style="flex:1; background:linear-gradient(90deg, #2aa6ff, #7b7bff); color:#02131c">Guardar + TG</button>
+      <div style="display:flex; gap:10px; margin-top:16px">
+        <button class="btn" id="saveBtn" style="flex:1">💾 Guardar</button>
         <button class="btn secondary" id="closeSheet">Cerrar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Mascota -->
-  <div id="pet" class="pet idle" data-species="cat" aria-live="polite">
-    <svg class="pet-svg" viewBox="0 0 120 120" aria-hidden="true">
-      <rect class="tail" x="96" y="76" rx="10" ry="10" width="10" height="22" fill="var(--p-body)"/>
-      <ellipse cx="60" cy="82" rx="34" ry="26" fill="var(--p-body)"/>
-      <ellipse cx="60" cy="86" rx="22" ry="16" fill="var(--p-belly)"/>
-      <rect x="30" y="66" width="14" height="18" rx="8" fill="var(--p-body)" />
-      <rect class="arm-right" x="74" y="58" width="14" height="26" rx="8" fill="var(--p-body)" />
-      <circle cx="60" cy="46" r="26" fill="var(--p-body)"/>
-      <g class="ears" fill="var(--p-body)">
-        <path d="M36 34 l-10 -8 a10 10 0 0 1 18 -6 z"/>
-        <path d="M84 34 l10 -8 a10 10 0 0 0 -18 -6 z"/>
-      </g>
-      <g fill="var(--p-eye)">
-        <circle class="eye" cx="50" cy="45" r="3.2"/>
-        <circle class="eye" cx="70" cy="45" r="3.2"/>
-      </g>
-      <g class="nose" fill="var(--p-nose)"><ellipse cx="60" cy="52" rx="4.5" ry="3.2"/></g>
-      <g class="beak"><polygon points="60,50 66,54 60,58 54,54" fill="var(--p-beak)"/></g>
-      <g fill="#ffbfd1" opacity=".45"><circle cx="44" cy="52" r="4"/><circle cx="76" cy="52" r="4"/></g>
-      <rect x="46" y="98" width="14" height="10" rx="6" fill="var(--p-body)"/>
-      <rect x="60" y="98" width="14" height="10" rx="6" fill="var(--p-body)"/>
-    </svg>
-
-    <!-- Engranaje fuera del globo -->
-    <button id="petGear" class="pet-gear" title="Cambiar mascota">⚙️</button>
-
-    <div id="petFx" class="fx"></div>
-
-    <!-- Globo -->
-    <div id="petBubble" class="pet-bubble" role="status">
-      <button id="petHide" class="x" title="Ocultar">×</button>
-      <span class="txt">Hola 👋</span>
-    </div>
-  </div>
-  <button id="petShow" class="pet-show">🐾</button>
-
-  <!-- Selector -->
-  <div id="petPicker" class="pet-picker" aria-modal="true" role="dialog">
-    <div class="pet-panel">
-      <h4>Elige tu mascota</h4>
-      <div class="pet-grid">
-        <button class="pet-opt" data-species="dog"><div class="avatar">🐶</div><small>Cachorrito</small></button>
-        <button class="pet-opt" data-species="cat"><div class="avatar">🐱</div><small>Gatito</small></button>
-        <button class="pet-opt" data-species="chick"><div class="avatar">🐥</div><small>Pollito</small></button>
-        <button class="pet-opt" data-species="koala"><div class="avatar">🐨</div><small>Koala</small></button>
       </div>
     </div>
   </div>
@@ -362,121 +323,21 @@ function fatal(err){
   bar.innerHTML=`<strong>⚠️ Error en el calendario:</strong> ${err.message||err}`;
   document.body.appendChild(bar);
 }
-function toast(msg){
+function toast(msg, icon = "✅"){
   const t=document.createElement('div');
-  t.className='toast'; t.textContent=msg; document.body.appendChild(t);
+  t.className='toast';
+  t.innerHTML = `${icon} ${msg}`;
+  document.body.appendChild(t);
   requestAnimationFrame(()=> t.classList.add('show'));
-  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),250); }, 1500);
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),250); }, 2000);
 }
-
-/* ===== Utilidades Telegram ===== */
-function tgShareLinkFromEvent(title, eventAtMs, offsetMin){
-  const when = new Date(eventAtMs||Date.now());
-  const fmt = new Intl.DateTimeFormat('es-MX', { dateStyle:'full', timeStyle:'short' }).format(when);
-  const offTxt = offsetMin ? ` (🔔 ${offsetMin}m antes)` : '';
-  const text = `📌 ${title}\n🗓️ ${fmt}${offTxt}\n\n#Recordatorio`;
-  const base = 'https://t.me/share/url';
-  const urlParam = encodeURIComponent(location.href);
-  return `${base}?url=${urlParam}&text=${encodeURIComponent(text)}`;
-}
-
-/* ===== Mascota con drag + poses ===== */
-const Pet = (()=>{
-
-  let root,bubble,showBtn,hideBtn,gearBtn,picker,opts,holdTimer=null;
-  const LS_HIDE='pet_hidden_v1', LS_SPEC='pet_species_v1', LS_POS='pet_pos_v1';
-
-  // temporizador para cancelar tipeo previo
-  let typingTimer = null;
-
-  function create(){
-    root=document.getElementById('pet'); bubble=document.getElementById('petBubble');
-    showBtn=document.getElementById('petShow'); hideBtn=document.getElementById('petHide');
-    gearBtn=document.getElementById('petGear'); picker=document.getElementById('petPicker');
-    opts=[...picker.querySelectorAll('.pet-opt')];
-    const hidden = localStorage.getItem(LS_HIDE)==='1';
-    const species = localStorage.getItem(LS_SPEC) || root.dataset.species || 'cat';
-    setSpecies(species); applySavedPos();
-    root.style.display = hidden ? 'none':'flex'; showBtn.style.display = hidden ? 'inline-flex':'none';
-
-    hideBtn.addEventListener('click', hidePet);
-    showBtn.addEventListener('click', ()=>{ show(); wave(); say(greetMsg()); });
-    gearBtn.addEventListener('click', openPicker);
-    opts.forEach(b=> b.addEventListener('click', ()=>{ setSpecies(b.dataset.species); closePicker(); wave(); say(specyHello()); }));
-    picker.addEventListener('click', (e)=>{ if (e.target===picker) closePicker(); });
-    root.addEventListener('touchstart', ()=>{ holdTimer=setTimeout(openPicker, 550); }, {passive:true});
-    root.addEventListener('touchend', ()=>{ clearTimeout(holdTimer); holdTimer=null; });
-    enableDrag(); setMood((new Date()).getHours()); setPose('idle');
-    return api;
-  }
-
-  function enableDrag(){
-    let drag=false, sx=0, sy=0, startL=0, startB=0; const getNum=v=>Number(String(v||'0').replace('px',''))||0;
-    const clamp=(v,min,max)=> Math.max(min, Math.min(max, v));
-    const el=document.getElementById('pet');
-    el.addEventListener('pointerdown', e=>{
-      // No arrastrar si se hace click en el globo o en el engranaje
-      if (e.target.closest('.pet-bubble') || e.target.closest('#petGear')) return;
-      drag=true; el.classList.add('dragging'); el.setPointerCapture(e.pointerId);
-      sx=e.clientX; sy=e.clientY; const cs=getComputedStyle(el); startL=getNum(cs.left); startB=getNum(cs.bottom);
-    });
-    el.addEventListener('pointermove', e=>{ if(!drag)return; const dx=e.clientX-sx, dy=e.clientY-sy; const rect=el.getBoundingClientRect(); const nl=clamp(startL+dx,8,innerWidth-rect.width-8); const nb=clamp(startB-dy,8,innerHeight-rect.height-8); el.style.left=nl+'px'; el.style.bottom=nb+'px'; });
-    el.addEventListener('pointerup', ()=>{ if(!drag)return; drag=false; el.classList.remove('dragging'); localStorage.setItem(LS_POS, JSON.stringify({left:parseInt(el.style.left||'16'), bottom:parseInt(el.style.bottom||'16')})); });
-  }
-  function applySavedPos(){ try{ const p=JSON.parse(localStorage.getItem(LS_POS)||'{}'); if(typeof p.left==='number') pet.style.left=p.left+'px'; if(typeof p.bottom==='number') pet.style.bottom=p.bottom+'px'; }catch{} }
-  function setSpecies(sp){ pet.dataset.species=sp; localStorage.setItem(LS_SPEC,sp); if (opts) opts.forEach(o=> o.classList.toggle('active', o.dataset.species===sp)); }
-  function openPicker(){ picker.classList.add('open'); } function closePicker(){ picker.classList.remove('open'); }
-
-  function show(){ pet.style.display='flex'; showBtn.style.display='none'; localStorage.setItem(LS_HIDE,'0'); }
-  function hidePet(){
-    // al ocultar, apagar cualquier tipeo en progreso
-    if (typingTimer){ clearInterval(typingTimer); typingTimer=null; }
-    bubble.classList.remove('show');
-    pet.style.display='none'; showBtn.style.display='inline-flex'; localStorage.setItem(LS_HIDE,'1');
-  }
-
-  function wave(){ pet.classList.add('wave','wag'); setTimeout(()=> pet.classList.remove('wave','wag'),1200); }
-  function sleep(){ pet.classList.add('sleep'); } function wake(){ pet.classList.remove('sleep'); }
-  function setMood(h){ (h>=22||h<6)?sleep():wake(); }
-  function setPose(p){ pet.classList.remove('pose-alert','pose-focus','pose-happy'); if(p==='alert')pet.classList.add('pose-alert'); else if(p==='focus')pet.classList.add('pose-focus'); else if(p==='happy')pet.classList.add('pose-happy'); }
-
-  // decir mensaje sin mezclar letras (cancela y escribe por codepoints)
-  function say(text){
-    bubble.classList.add('show');
-
-    if (typingTimer){ clearInterval(typingTimer); typingTimer = null; }
-
-    const t = bubble.querySelector('.txt');
-    t.textContent = '';
-
-    const glyphs = Array.from(text); // emojis y acentos seguros
-    let i = 0;
-
-    typingTimer = setInterval(()=>{
-      t.textContent += glyphs[i++];
-      if (i >= glyphs.length){
-        clearInterval(typingTimer);
-        typingTimer = null;
-      }
-    }, 18);
-  }
-
-  function specyHello(){ const sp=pet.dataset.species; return sp==='dog'?'¡Guau! 🐶':sp==='cat'?'¡Miau! 🐱':sp==='chick'?'¡Pío! 🐥':'¡Hola! 🐨'; }
-  function greetMsg(){ const h=(new Date()).getHours(); const base=h<12?'¡Buenos días!':(h<19?'¡Buenas tardes!':'¡Buenas noches!'); return `${base} ${specyHello()}`; }
-  function greet(ctx){ setMood((new Date()).getHours()); wave(); if(ctx&&ctx.todayTotal>0){ const t=ctx.todayPending>0?`${greetMsg()} Hoy tienes ${ctx.todayPending} pendiente(s).`:`${greetMsg()} ¡Todo listo por hoy! ✨`; say(t);} else { say(`${greetMsg()} ¿Agendamos algo?`);} }
-  function confetti(){ const fx=document.getElementById('petFx'); for(let i=0;i<10;i++){ const s=document.createElement('span'); s.className='confetti'; s.style.left=(10+Math.random()*100)+'px'; s.style.animationDelay=(Math.random()*0.2)+'s'; s.textContent=['✨','🎉','🌟','💖'][Math.floor(Math.random()*4)]; fx.appendChild(s); setTimeout(()=>s.remove(),1800);} }
-  const api={create,setSpecies,openPicker,closePicker,greet,say: say,wave,confetti,setPose};
-  return api;
-})();
 
 /* ===== Calendario ===== */
 function initCalendar(){
-  const ids=['monthLabel','weekdays','grid','prevBtn','nextBtn','todayBtn','sheet','sheetDate','evList','evTitle','evTime','evOffset','saveBtn','saveTgBtn','closeSheet','fab','dragbar','streakLabel','quickChips','previewText'];
+  const ids=['monthLabel','weekdays','grid','prevBtn','nextBtn','todayBtn','sheet','sheetDate','evList','evTitle','evTime','evOffset','saveBtn','closeSheet','fab','dragbar','streakLabel','quickChips','previewText'];
   const $=id=>document.getElementById(id);
   const els=Object.fromEntries(ids.map(id=>[id,$(id)]));
   if (Object.values(els).some(v=>!v)) throw new Error('Faltan elementos del DOM');
-
-  const pet = Pet.create(); window.__pet=pet; let greeted=false, lastPose='idle';
 
   const WEEK_START='monday', locale='es-MX';
   const URG={high:'high',med:'med',low:'low',past:'past'};
@@ -540,31 +401,6 @@ function initCalendar(){
     const map=loadEvents();
     els.streakLabel.textContent='🔥 '+computeStreak(map);
     renderGrid(map);
-
-    // saludo y poses
-    const pose = todayPose(map);
-    if (!greeted && window.__pet){
-      const key = ymd(stripTime(new Date()));
-      const list = map[key] || [];
-      const pending = list.filter(e=>!e.done && e.remindAt>0).length;
-      window.__pet.greet({ todayTotal:list.length, todayPending:pending });
-      greeted=true;
-    }
-    if (window.__pet && pose!==lastPose){
-      window.__pet.setPose(pose);
-      if (pose==='alert'){ window.__pet.say('⏰ Tienes recordatorios urgentes'); }
-      if (pose==='happy'){ window.__pet.say('¡Todo listo por hoy! ✨'); window.__pet.confetti(); }
-      lastPose=pose;
-    }
-  }
-  function todayPose(map){
-    const key=ymd(stripTime(new Date())), list=(map[key]||[]);
-    const pending=list.filter(e=>!e.done && e.remindAt>0);
-    if (pending.length===0) return list.length? 'happy':'idle';
-    const urg = pending.map(e=>urgencyFor(e.remindAt,false));
-    if (urg.includes('high')) return 'alert';
-    if (urg.includes('med'))  return 'focus';
-    return 'idle';
   }
 
   function renderGrid(data){
@@ -575,7 +411,7 @@ function initCalendar(){
       const cell=document.createElement('button');
       cell.className='day' + (inMonth?'':' out') + (([0,6].includes(thisDate.getDay()))?' weekend':'');
       cell.dataset.date=ymd(thisDate);
-      cell.setAttribute('aria-label', new Intl.DateTimeFormat(locale,{dateStyle:'full'}).format(thisDate));
+      cell.setAttribute('aria-label', new Intl.DateTimeFormat('es-MX',{dateStyle:'full'}).format(thisDate));
       cell.textContent=thisDate.getDate();
 
       if (sameDay(thisDate,new Date())){ const ring=document.createElement('div'); ring.className='ring-today'; cell.appendChild(ring); }
@@ -601,7 +437,14 @@ function initCalendar(){
     }
   }
 
-  function openSheet(){ els.sheet.classList.add('open'); els.sheetDate.textContent=formatLong(state.selected); paintDayEvents(); buildQuickChips(); updatePreview(); setTimeout(()=>{ if(!els.evTitle.value) els.evTitle.focus(); }, 120); }
+  function openSheet(){
+    els.sheet.classList.add('open');
+    els.sheetDate.textContent=formatLong(state.selected);
+    paintDayEvents();
+    buildQuickChips();
+    updatePreview();
+    setTimeout(()=>{ if(!els.evTitle.value) els.evTitle.focus(); }, 120);
+  }
   function closeSheetFn(){ els.sheet.classList.remove('open'); }
   els.closeSheet.addEventListener('click', closeSheetFn);
 
@@ -616,7 +459,13 @@ function initCalendar(){
     ];
     const box=document.getElementById('quickChips');
     box.innerHTML='';
-    chips.forEach(c=>{ const b=document.createElement('button'); b.className='chip-btn'; b.textContent=c.label; b.addEventListener('click', ()=>{ c.act(); updatePreview(); }); box.appendChild(b); });
+    chips.forEach(c=>{
+      const b=document.createElement('button');
+      b.className='chip-btn';
+      b.textContent=c.label;
+      b.addEventListener('click', ()=>{ c.act(); updatePreview(); });
+      box.appendChild(b);
+    });
     function setFromRelative(min){ const when=new Date(now.getTime()+min*60000); setDateTime(stripTime(when), when.toTimeString().slice(0,5)); els.evOffset.value='0'; }
     function setDateTime(d, hhmm){ state.selected=d; els.sheetDate.textContent=formatLong(d); els.evTime.value=hhmm; }
   }
@@ -638,7 +487,6 @@ function initCalendar(){
           <div style="margin-left:10px; display:flex; gap:6px">
             <button class="mini good" data-done="${idx}" title="Marcar hecho">✔</button>
             <button class="mini" data-snooze="${idx}" title="Posponer 10 min">⏰+10m</button>
-            <button class="mini tg" data-tg="${idx}" title="Compartir por Telegram">📤 TG</button>
             <button class="mini danger" data-del="${idx}" title="Eliminar">🗑</button>
           </div>`;
         row.querySelector('[data-del]').addEventListener('click', e=>{
@@ -646,23 +494,20 @@ function initCalendar(){
         });
         row.querySelector('[data-done]').addEventListener('click', e=>{
           const i=Number(e.currentTarget.getAttribute('data-done')); const map=loadEvents(); map[key][i].done=!map[key][i].done; saveEvents(map); paintDayEvents(); render();
-          if (window.__pet){ window.__pet.say('¡Bien hecho! ✔'); window.__pet.confetti(); }
+          toast('¡Bien hecho! ✔');
         });
         row.querySelector('[data-snooze]').addEventListener('click', e=>{
           const i=Number(e.currentTarget.getAttribute('data-snooze')); const map=loadEvents(); const now=Date.now();
           map[key][i].remindAt = now + 10*60000;
           const d=new Date(map[key][i].remindAt); map[key][i].date=ymd(d); map[key][i].time=d.toTimeString().slice(0,5);
           saveEvents(map);
-          if (map[key][i].date!==key){ const moved=map[key].splice(i,1)[0]; map[moved.date]=map[moved.date]||[]; map[moved.date].push(moved); saveEvents(map); }
+          if (map[key][i].date!==key){
+            const moved=map[key].splice(i,1)[0];
+            map[moved.date]=map[moved.date]||[]; map[moved.date].push(moved);
+            saveEvents(map);
+          }
           paintDayEvents(); render();
-          if (window.__pet){ window.__pet.say('Lo pospuse 10 min ⏰'); }
-        });
-        // NUEVO: compartir por Telegram
-        row.querySelector('[data-tg]').addEventListener('click', e=>{
-          const i=Number(e.currentTarget.getAttribute('data-tg'));
-          const ev=items[i];
-          const link=tgShareLinkFromEvent(ev.title, ev.eventAt, ev.offsetMin);
-          window.open(link, '_blank', 'noopener,noreferrer');
+          toast('Pospuesto 10 min ⏰');
         });
         els.evList.appendChild(row);
       });
@@ -672,6 +517,7 @@ function initCalendar(){
   function updatePreview(){
     const parsed = parseSmart(els.evTitle.value.trim(), state.selected, (els.evTime.value||'09:00'), parseInt(els.evOffset.value||'0',10));
     const eventAt = toDateTime(parsed.date, parsed.hhmm);
+    const remindAt = new Date(eventAt.getTime() - parsed.offsetMin*60000);
     const whenTxt = new Intl.DateTimeFormat('es-MX',{weekday:'short', day:'numeric', month:'short'}).format(parsed.date);
     const offsetTxt = parsed.offsetMin ? ` · 🔔 ${parsed.offsetMin}m antes` : '';
     els.previewText.textContent = `📌 ${parsed.title || '—'}  ·  ⏱️ ${whenTxt} ${parsed.hhmm}${offsetTxt}`;
@@ -682,39 +528,20 @@ function initCalendar(){
     document.getElementById('evOffset').addEventListener(ev, updatePreview);
   });
 
-  // Guardar genérico (reutilizado por guardar y guardar+TG)
-  function persistParsed(parsed){
+  // Guardar
+  els.saveBtn.addEventListener('click', ()=>{
+    const parsed = parseSmart(els.evTitle.value.trim(), state.selected, (els.evTime.value||'09:00'), parseInt(els.evOffset.value||'0',10));
+    if (!parsed.title){ els.evTitle.focus(); return; }
     state.selected = parsed.date;
     const eventAt = toDateTime(parsed.date, parsed.hhmm);
     const remindAt = new Date(eventAt.getTime() - parsed.offsetMin*60000);
     const map=loadEvents(); const key=ymd(parsed.date);
     map[key]=map[key]||[];
-    const obj={ title: parsed.title, date:key, time:parsed.hhmm, offsetMin:parsed.offsetMin, eventAt:eventAt.getTime(), remindAt:remindAt.getTime(), createdAt:Date.now(), done:false };
-    map[key].push(obj);
+    map[key].push({ title: parsed.title, date:key, time:parsed.hhmm, offsetMin:parsed.offsetMin, eventAt:eventAt.getTime(), remindAt:remindAt.getTime(), createdAt:Date.now(), done:false });
     saveEvents(map);
     els.evTitle.value=''; els.evTime.value=parsed.hhmm; els.evOffset.value=String(parsed.offsetMin);
     els.sheetDate.textContent=formatLong(parsed.date); updatePreview(); paintDayEvents(); render();
-    return {eventAt, remindAt, obj};
-  }
-
-  // Guardar
-  els.saveBtn.addEventListener('click', ()=>{
-    const parsed = parseSmart(els.evTitle.value.trim(), state.selected, (els.evTime.value||'09:00'), parseInt(els.evOffset.value||'0',10));
-    if (!parsed.title){ els.evTitle.focus(); return; }
-    const {remindAt} = persistParsed(parsed);
-    toast('✅ Recordatorio guardado');
-    if (window.__pet){ const diff=remindAt.getTime()-Date.now(); window.__pet.say('¡Anotado! Te aviso ' + relTime(diff)); window.__pet.confetti(); }
-  });
-
-  // NUEVO: Guardar + abrir Telegram
-  els.saveTgBtn.addEventListener('click', ()=>{
-    const parsed = parseSmart(els.evTitle.value.trim(), state.selected, (els.evTime.value||'09:00'), parseInt(els.evOffset.value||'0',10));
-    if (!parsed.title){ els.evTitle.focus(); return; }
-    const {eventAt, remindAt, obj} = persistParsed(parsed);
-    toast('✅ Guardado · Abriendo Telegram…');
-    const link = tgShareLinkFromEvent(obj.title, eventAt.getTime(), obj.offsetMin);
-    window.open(link, '_blank', 'noopener,noreferrer');
-    if (window.__pet){ const diff=remindAt.getTime()-Date.now(); window.__pet.say('¡Enviado a Telegram! ✈️ ' + relTime(diff)); window.__pet.confetti(); }
+    toast('Recordatorio guardado');
   });
 
   // FAB & navegación
@@ -736,8 +563,18 @@ function initCalendar(){
   document.getElementById('dragbar').addEventListener('touchstart', e=>{ dragStartY=e.touches[0].clientY; }, {passive:true});
   document.getElementById('dragbar').addEventListener('touchend', e=>{ if(dragStartY==null) return; const dy=e.changedTouches[0].clientY-dragStartY; if (dy>40) els.closeSheet.click(); dragStartY=null; });
 
+  // Efecto de scroll en topbar
+  window.addEventListener('scroll', () => {
+    const topbar = document.getElementById('topbar');
+    if (window.scrollY > 10) topbar.classList.add('scrolled'); else topbar.classList.remove('scrolled');
+  });
+
   // init
-  (function start(){ renderWeekdays(); render(); if (els.sheet.classList.contains('open')) updatePreview(); setInterval(()=>{ render(); if (els.sheet.classList.contains('open')) { paintDayEvents(); updatePreview(); } }, 60*1000); })();
+  (function start(){
+    renderWeekdays(); render();
+    if (els.sheet.classList.contains('open')) updatePreview();
+    setInterval(()=>{ render(); if (els.sheet.classList.contains('open')) { paintDayEvents(); updatePreview(); } }, 60*1000);
+  })();
 }
 </script>
 </body>
