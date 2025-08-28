@@ -95,7 +95,7 @@
     background:linear-gradient(180deg, rgba(18,22,33,.98), rgba(10,12,18,.98));
     border-top-left-radius:24px; border-top-right-radius:24px; border:1px solid var(--border);
     max-width:520px; margin:0 auto; box-shadow: var(--shadow);
-    display:flex; flex-direction:column; max-height:92dvh; /* casi fullscreen */
+    display:flex; flex-direction:column; max-height:92dvh;
     padding-bottom: max(12px, env(safe-area-inset-bottom));
   }
   .dragbar{ width:56px; height:6px; background:#2e3342; border-radius:999px; margin:8px auto 14px }
@@ -135,28 +135,46 @@
     padding:12px; border-radius:14px; border:1px solid var(--border);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
   }
-  .ev::before{ /* acento lateral curvo */
-    content:""; position:absolute; left:0; top:0; bottom:0; width:6px; border-radius:14px 0 0 14px; background:linear-gradient(180deg, var(--accent-a), var(--accent-b));
-  }
+  .ev::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:6px; border-radius:14px 0 0 14px; background:linear-gradient(180deg, var(--accent-a), var(--accent-b)); }
   .ev[data-urg="high"]::before{ background:linear-gradient(180deg,#ff9a9a,#ff6161) }
-  .ev[data-urg="med"]::before{ background:linear-gradient(180deg,#ffe39a,#ffd157) }
-  .ev[data-urg="low"]::before{ background:linear-gradient(180deg,#9ff7cf,#63f3a7) }
+  .ev[data-urg="med"]::before{  background:linear-gradient(180deg,#ffe39a,#ffd157) }
+  .ev[data-urg="low"]::before{  background:linear-gradient(180deg,#9ff7cf,#63f3a7) }
+
   .time{ font-weight:800; font-size:.92rem; color:#eaf2ff; min-width:58px }
   .title{ font-size:.98rem; line-height:1.35 }
   .meta{ margin-left:auto; font-size:.78rem; color:var(--muted); text-align:right; min-width:66px }
-  .mini{ height:36px; width:36px; border-radius:10px; border:1px solid var(--border); background:#10131b; color:#fff }
-  .mini.good{ border-color:rgba(102,245,160,.4); color:#66f5a0; background:rgba(102,245,160,.08) }
-  .mini.danger{ border-color:rgba(255,101,101,.4); background:rgba(255,101,101,.08) }
-  .ev.done .title{ text-decoration:line-through; opacity:.7 }
+
+  /* Botón ⋯ y menú */
+  .more{
+    margin-left:8px; height:36px; width:36px; border-radius:10px;
+    border:1px solid var(--border); background:#10131b; color:#cfe1ff; font-size:18px; line-height:1;
+  }
+  .more[aria-expanded="true"]{ box-shadow:0 0 0 3px rgba(124,140,255,.25); border-color:rgba(124,140,255,.5) }
+
+  .ev-menu{
+    position:absolute; right:8px; top:8px; z-index:3;
+    display:none; min-width:138px; padding:6px;
+    background:#0f131d; border:1px solid var(--border); border-radius:12px; box-shadow:0 16px 36px rgba(0,0,0,.35);
+  }
+  .ev-menu.open{ display:block; }
+  .ev-menu::before{
+    content:""; position:absolute; right:16px; top:-6px; width:10px; height:10px; transform:rotate(45deg);
+    background:#0f131d; border-left:1px solid var(--border); border-top:1px solid var(--border);
+  }
+  .opt{
+    width:100%; display:flex; align-items:center; gap:8px;
+    padding:10px 10px; border-radius:10px; border:1px solid transparent; background:#111623; color:#e7edff; font-weight:600; margin:4px 0;
+  }
+  .opt:hover{ background:#141a2a }
+  .opt.good{ border-color:rgba(102,245,160,.35); color:#66f5a0; background:rgba(102,245,160,.08) }
+  .opt.danger{ border-color:rgba(255,101,101,.35); background:rgba(255,101,101,.08) }
 
   /* Acciones sticky */
   .sheet-actions{
     position:sticky; bottom:0; margin-top:10px; padding:10px 14px 0; background:linear-gradient(180deg, transparent 0, rgba(12,14,20,.92) 28%);
     display:flex; gap:10px;
   }
-  .btn{
-    height:50px; border-radius:14px; border:0; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px;
-  }
+  .btn{ height:50px; border-radius:14px; border:0; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; }
   #saveBtn{ flex:1; background:linear-gradient(90deg,var(--accent-a),var(--accent-b)); color:#041a16; box-shadow:0 12px 28px rgba(46,214,186,.28) }
   #closeSheet{ width:120px; background:#161a24; color:var(--muted); border:1px solid var(--border) }
 
@@ -301,13 +319,13 @@ function initCalendar(){
   function streak(map){
     let s=0; const today=strip(new Date()); let d=new Date(today);
     while(true){ const key=ymd(d), list=(map[key]||[]), hasPending=list.some(e=>!e.done && e.remindAt>0);
-      if (list.length && !hasPending){ s++; d.setDate(d.getDate()-1); continue; } break; }
+      if (list.length && !hasPending){ s++; d.setDate(d.getDate()-1); continue; } break;
+    }
     return s;
   }
 
   function renderWeekdays(){
     const mon=['L','M','X','J','V','S','D'], sun=['D','L','M','X','J','V','S'];
-    (WEEK_START==='monday'?mon:sun);
     const list=(WEEK_START==='monday'?mon:sun).map((d,i)=>`<div${(i>=5)?' style="color:#9fbaff"':''}>${d}</div>`).join('');
     els.weekdays.innerHTML=list;
   }
@@ -380,6 +398,14 @@ function initCalendar(){
     function setDate(d, hhmm){ state.selected=d; els.sheetDate.textContent=fmtLong(d); els.evTime.value=hhmm; }
   }
 
+  function closeAllMenus(){
+    document.querySelectorAll('.ev-menu.open').forEach(m=>{
+      m.classList.remove('open');
+      const btn = m.parentElement.querySelector('.more');
+      if(btn) btn.setAttribute('aria-expanded','false');
+    });
+  }
+
   function paintDay(){
     if (!els.sheet.classList.contains('open')) return;
     const data=load(), key=ymd(state.selected), items=data[key]||[];
@@ -394,16 +420,27 @@ function initCalendar(){
           <div class="time">${it.time||'--:--'}</div>
           <div class="title">${esc(it.title||'Sin título')}</div>
           <div class="meta">${r}${off}</div>
-          <div style="margin-left:8px; display:flex; gap:6px">
-            <button class="mini good" data-done="${idx}" title="Hecho">✔</button>
-            <button class="mini" data-snooze="${idx}" title="Posponer 10 min">⏰+10m</button>
-            <button class="mini danger" data-del="${idx}" title="Eliminar">🗑</button>
+          <button class="more" data-more="${idx}" aria-label="Más acciones" aria-expanded="false">⋯</button>
+          <div class="ev-menu" role="menu">
+            <button class="opt good" data-done="${idx}" role="menuitem">✔ Hecho</button>
+            <button class="opt" data-snooze="${idx}" role="menuitem">⏰ +10m</button>
+            <button class="opt danger" data-del="${idx}" role="menuitem">🗑 Eliminar</button>
           </div>`;
+        // Toggle menú
+        row.querySelector('[data-more]').addEventListener('click', e=>{
+          e.stopPropagation();
+          const btn=e.currentTarget;
+          const menu=row.querySelector('.ev-menu');
+          const isOpen=menu.classList.contains('open');
+          closeAllMenus();
+          if(!isOpen){ menu.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
+        });
+        // Acciones
         row.querySelector('[data-del]').addEventListener('click', e=>{
-          const i=+e.currentTarget.getAttribute('data-del'); const map=load(); map[key].splice(i,1); save(map); paintDay(); render();
+          const i=+e.currentTarget.getAttribute('data-del'); const map=load(); map[key].splice(i,1); save(map); closeAllMenus(); paintDay(); render();
         });
         row.querySelector('[data-done]').addEventListener('click', e=>{
-          const i=+e.currentTarget.getAttribute('data-done'); const map=load(); map[key][i].done=!map[key][i].done; save(map); paintDay(); render(); toast('¡Listo! ✔');
+          const i=+e.currentTarget.getAttribute('data-done'); const map=load(); map[key][i].done=!map[key][i].done; save(map); closeAllMenus(); paintDay(); render(); toast('¡Listo! ✔');
         });
         row.querySelector('[data-snooze]').addEventListener('click', e=>{
           const i=+e.currentTarget.getAttribute('data-snooze'); const map=load(); const now=Date.now();
@@ -414,17 +451,20 @@ function initCalendar(){
             const moved=map[key].splice(i,1)[0];
             map[moved.date]=map[moved.date]||[]; map[moved.date].push(moved); save(map);
           }
-          paintDay(); render(); toast('Pospuesto 10 min ⏰');
+          closeAllMenus(); paintDay(); render(); toast('Pospuesto 10 min ⏰');
         });
         els.evList.appendChild(row);
       });
+
+    // Cierre de menús: fuera, scroll
+    document.addEventListener('click', (ev)=>{ if(!ev.target.closest('.ev-menu') && !ev.target.closest('.more')) closeAllMenus(); }, {once:true});
+    els.evList.addEventListener('scroll', closeAllMenus, {once:true});
   }
 
   // Preview
   function updatePreview(){
     const p = parseSmart(els.evTitle.value.trim(), state.selected, (els.evTime.value||'09:00'), parseInt(els.evOffset.value||'0',10));
     const eventAt = toDT(p.date, p.hhmm);
-    const remindAt = new Date(eventAt.getTime() - p.offsetMin*60000);
     const whenTxt = new Intl.DateTimeFormat('es-MX',{weekday:'short', day:'numeric', month:'short'}).format(p.date);
     const offsetTxt = p.offsetMin ? ` · 🔔 ${p.offsetMin}m antes` : '';
     els.previewText.textContent = `📌 ${p.title || '—'}  ·  ⏱️ ${whenTxt} ${p.hhmm}${offsetTxt}`;
